@@ -74,7 +74,7 @@
 
 --1) Inicialmente, vamos criar uma tabela com o nome do aluno, com todos pacientes cadastrados
 --no ano de 2017, no formato:
---CREATE TABLE PC_TREINA_MATHEUS AS
+--CREATE TABLE PC_TREINA_MAURO AS
 --SELECT * FROM PACIENTE
 --WHERE TRUNC(HR_CADASTRO,'YYYY') = TO_DATE('01/01/2017', 'DD/MM/YYYY'):
 --Posteriormente, vamos:
@@ -82,17 +82,49 @@
 -- * Depois, mudar o estado civil para ‘C’ de todos pacientes da cidade SÃO PAULO CAPITAL;
 -- * Por fim, inserir todos pacientes cadastrados no ano de 2019.
 
+    DELETE FROM pc_treina_mauro WHERE nm_paciente LIKE 'C%';
+
+    UPDATE pc_treina_mauro
+       SET tp_estado_civil = 'C'
+     WHERE cd_cidade IN (SELECT cd_cidade
+                           FROM dbamv.cidade
+                          WHERE nm_cidade = 'SAO PAULO CAPITAL');
+
+    INSERT INTO pc_treina_mauro
+    SELECT *
+      FROM paciente
+     WHERE TRUNC(HR_CADASTRO,'YYYY') = TO_DATE('01/01/2017', 'DD/MM/YYYY');
+
 --2) Neste exercício, vamos criar uma tabela de backup da tabela produto, com todos produtos
---cadastrados em 2015, com nome prod_treina_nome:
+--   cadastrados em 2015, com nome prod_treina_nome:
 -- * Deletar todos produtos da subclasse 16;
 -- * Depois, atualizar a hora da última entrada para o SYSDATE em todos os produtos
 --considerados consignados.
+
+    CREATE TABLE bkp_produto_mauro AS
+    SELECT *
+      FROM dbamv.produto
+     WHERE Trunc (dt_cadastro,'YYYY') = To_Date('01/01/2015','dd/mm/YYYY');
+
+     DELETE * FROM bkp_produto_mauro  WHERE cd_sub_cla = 16;
+
+     UPDATE bkp_produto_mauro SET hr_ultima_entrada = SYSDATE WHERE sn_consignado = 'S'
 
 --3) Criar uma cópia da tabela pro_fat (formato pro_fat_treina_nome) com todos os procedimentos
 --que estão presentes na tabela cirurgia:
 -- * Deletar todos os procedimentos que precisam de 3 ou mais auxiliares;
 -- * Depois, alterar o cd_gru_pro (grupo de faturamento) 52 para 99;
 -- * Por fim, importar da tabela pro_fat todos procedimentos com cd_gru_pro = 1.
+
+     CREATE TABLE pro_fat_treina_mauro AS
+     SELECT * FROM
+
+     DELETE FROM pro_fat_treina_mauro WHERE nr_auxiliar >= 3;
+
+     UPDATE pro_fat_treina_mauro SET cd_gru_pro = 99 WHERE cd_gru_pro = 52;
+
+     INSERT INTO pro_fat_treina_mauro
+     SELECT * FROM  dbamv.pro_fat WHERE cd_gru_pro = 1;
 
 --4) Criar uma cópia da tabela prestador (formato presta_treina_nome), com todos os prestadores
 --ativos:
